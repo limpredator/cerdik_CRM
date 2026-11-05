@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+/* Follows the OS light/dark preference, same as the softphone's v1 (no
+   manual toggle yet) — `dark:` utilities respond to prefers-color-scheme
+   automatically with Tailwind v4's default media-query variant. */
+
+:root {
+  --background: #f4f5f8;
+  --foreground: #171a20;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: "Segoe UI", system-ui, -apple-system, "Roboto", sans-serif;
+  --font-mono: Consolas, ui-monospace, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0f1218;
+    --foreground: #f4f6fa;
+  }
+}
+
+/*
+ * Cerdik Suite look (Console + Call Billing + shell + softphone). The
+ * Suite's own palette lives in shell/renderer/style.css: deep navy
+ * surfaces in dark mode (#0f1218 page, #1b1f2a raised, #3a4252 lines),
+ * cool off-white in light mode (#f4f5f8 page, #d3d8e2 lines), and one
+ * orange accent (#e8691a). Both scales are remapped here so every
+ * ordinary Tailwind class (`bg-zinc-950`, `text-zinc-500`,
+ * `bg-indigo-600`, ...) picks it up without touching components.
+ *
+ * `emerald`, `red`, `amber`, and `violet` are deliberately untouched —
+ * they carry meanings (online, danger, warning, on-a-call) that must
+ * stay distinct from the brand accent.
+ */
+@theme {
+  --color-zinc-50: #f4f5f8;
+  --color-zinc-100: #e9ecf2;
+  --color-zinc-200: #d3d8e2;
+  --color-zinc-300: #b8c0ce;
+  --color-zinc-400: #8f99ab;
+  --color-zinc-500: #6f7a8e;
+  --color-zinc-600: #5b6475;
+  --color-zinc-700: #3a4252;
+  --color-zinc-800: #262c3a;
+  --color-zinc-900: #1b1f2a;
+  --color-zinc-950: #0f1218;
+
+  --color-indigo-50: #fdf1e8;
+  --color-indigo-100: #fbe0cc;
+  --color-indigo-200: #f7c29b;
+  --color-indigo-300: #f4a06a;
+  --color-indigo-400: #f08240;
+  --color-indigo-500: #ed7224;
+  --color-indigo-600: #e8691a;
+  --color-indigo-700: #c4540f;
+  --color-indigo-800: #9c4210;
+  --color-indigo-900: #7a3412;
+  --color-indigo-950: #3f1a07;
+}
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--background) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--background);
+  border-radius: 6px;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}

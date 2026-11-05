@@ -19,6 +19,8 @@ future multi-tenant move.
   brand only needs a second class implementing the same interface.
 - **Auth:** `AuthProvider` interface (`shared/src/auth-provider.ts`) with a
   local bcrypt+JWT implementation — swappable later for shared/SSO login.
+- **Theme:** Tailwind v4, styled to match the Cerdik Suite / softphone
+  brand (navy/grey surfaces, orange accent, OS-driven dark mode).
 
 ## Repo layout
 
@@ -67,6 +69,17 @@ docs/     MQTT-API.md
    ```
    Open http://localhost:5173, sign in, pick an extension, and you're on
    the agent screen.
+
+## Running it in production (one-click launcher)
+
+On a machine that already has Docker Desktop and a real `.env` set up
+once (see steps 1–2 above), just double-click **`start.bat`** in the repo
+root. It pulls the latest code, installs dependencies, brings up
+Postgres, runs migrations, builds the web app, and starts the server —
+which then serves both the API and the built web app from one process on
+`http://localhost:4100`. The window it opens shows the server's live log;
+closing it stops the server. Run it again any time to update and
+restart.
 
 ## Tests
 

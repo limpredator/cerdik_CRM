@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { getToken } from './api';
 
-const WS_URL = import.meta.env.VITE_WS_URL ?? 'ws://localhost:4100/ws';
+// Same-origin by default (matches api.ts) — derived from the page's own
+// location so it works whatever host/port the server ends up on.
+const WS_URL =
+  import.meta.env.VITE_WS_URL ?? `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}/ws`;
 
 export interface RingingCall {
   kind: 'ringing';

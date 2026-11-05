@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
+import { btnPrimary, btnSecondary, inputCls } from './ui';
 
 export function Dialer() {
   const { extension } = useAuth();
@@ -10,7 +11,7 @@ export function Dialer() {
   const dial = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!extension || !target.trim()) return;
-    setStatus('Dialing...');
+    setStatus('Dialing…');
     try {
       await api.dial(target.trim(), extension);
       setStatus(`Ringing ${target}`);
@@ -20,15 +21,17 @@ export function Dialer() {
   };
 
   return (
-    <form onSubmit={dial} style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+    <form onSubmit={dial} className="flex flex-wrap items-center gap-2">
       <input
         placeholder="Extension or number"
         value={target}
         onChange={(e) => setTarget(e.target.value)}
-        style={{ flex: 1, padding: 8 }}
+        className={`${inputCls} flex-1`}
       />
-      <button type="submit">Dial</button>
-      {status && <span style={{ alignSelf: 'center', color: '#555' }}>{status}</span>}
+      <button type="submit" className={btnPrimary}>
+        Dial
+      </button>
+      {status && <span className="text-sm text-zinc-500 dark:text-zinc-400">{status}</span>}
     </form>
   );
 }
@@ -40,7 +43,7 @@ export function DialButton({ target, label }: { target: string; label?: string }
 
   const dial = async () => {
     if (!extension) return;
-    setStatus('...');
+    setStatus('…');
     try {
       await api.dial(target, extension);
       setStatus('ringing');
@@ -50,8 +53,9 @@ export function DialButton({ target, label }: { target: string; label?: string }
   };
 
   return (
-    <button onClick={dial} title={`Dial ${target}`}>
-      {label ?? `Call ${target}`} {status ? `(${status})` : ''}
+    <button onClick={dial} title={`Dial ${target}`} className={btnSecondary}>
+      {label ?? `Call ${target}`}
+      {status ? <span className="text-zinc-400 dark:text-zinc-500">({status})</span> : null}
     </button>
   );
 }

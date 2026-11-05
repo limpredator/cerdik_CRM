@@ -2,35 +2,35 @@ import { useMemo } from 'react';
 import type { RingingCall } from '../lib/useLiveCalls';
 import { NewContactForm } from './NewContactForm';
 import { CallTimer } from './CallTimer';
+import { Avatar, btnGhost, Card } from './ui';
 
 export function CallPopup({ call, onDismiss }: { call: RingingCall; onDismiss: () => void }) {
   const since = useMemo(() => Date.now(), [call.callId]);
 
   return (
-    <div
-      style={{
-        border: '2px solid #2563eb',
-        borderRadius: 8,
-        padding: 16,
-        marginBottom: 16,
-        background: '#eff6ff',
-      }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <strong>Incoming call</strong>
+    <Card className="mb-6 border-indigo-200 p-5 dark:border-indigo-800/60">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold tracking-wide text-indigo-600 uppercase dark:text-indigo-400">
+          Incoming call
+        </span>
         <CallTimer since={since} />
       </div>
-      {call.contact ? (
-        <p style={{ fontSize: 18, margin: '8px 0' }}>{call.contact.name}</p>
-      ) : call.otherNumber ? (
-        <NewContactForm phone={call.otherNumber} onCreated={() => {}} />
-      ) : (
-        <p>Internal call from extension {call.fromExtension}</p>
-      )}
-      <p style={{ color: '#555' }}>From: {call.otherNumber ?? call.fromExtension}</p>
-      <button onClick={onDismiss} style={{ marginTop: 8 }}>
+      <div className="mt-3 flex items-center gap-3">
+        <Avatar name={call.contact?.name ?? call.otherNumber ?? call.fromExtension} size={12} />
+        <div className="min-w-0 flex-1">
+          {call.contact ? (
+            <p className="truncate text-lg font-semibold text-zinc-900 dark:text-zinc-50">{call.contact.name}</p>
+          ) : call.otherNumber ? (
+            <NewContactForm phone={call.otherNumber} onCreated={() => {}} />
+          ) : (
+            <p className="text-sm text-zinc-700 dark:text-zinc-200">Internal call from extension {call.fromExtension}</p>
+          )}
+          <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">From: {call.otherNumber ?? call.fromExtension}</p>
+        </div>
+      </div>
+      <button onClick={onDismiss} className={`${btnGhost} mt-3`}>
         Dismiss
       </button>
-    </div>
+    </Card>
   );
 }

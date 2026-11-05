@@ -10,5 +10,9 @@ export function CallTimer({ since }: { since: number }) {
 
   const mm = String(Math.floor(elapsed / 60)).padStart(2, '0');
   const ss = String(elapsed % 60).padStart(2, '0');
-  return <span style={{ fontFamily: 'monospace' }}>{mm}:{ss}</span>;
+  return (
+    <span className="font-mono text-sm font-medium text-zinc-500 dark:text-zinc-400">
+      {mm}:{ss}
+    </span>
+  );
 }

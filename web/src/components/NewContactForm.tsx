@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api } from '../lib/api';
+import { btnPrimary, inputCls, labelCls } from './ui';
 
 export function NewContactForm({ phone, onCreated }: { phone: string; onCreated: (contact: { id: string; name: string }) => void }) {
   const [name, setName] = useState('');
@@ -22,24 +23,32 @@ export function NewContactForm({ phone, onCreated }: { phone: string; onCreated:
   };
 
   return (
-    <form onSubmit={submit} style={{ marginTop: 8 }}>
-      <p style={{ margin: '4px 0' }}>Unknown number: {phone}</p>
+    <form onSubmit={submit} className="mt-2">
+      <p className="mb-2 text-sm text-zinc-600 dark:text-zinc-400">Unknown number: {phone}</p>
+      <label className={labelCls} htmlFor="new-contact-name">
+        Name
+      </label>
       <input
+        id="new-contact-name"
         placeholder="Name"
         value={name}
         onChange={(e) => setName(e.target.value)}
         required
-        style={{ display: 'block', width: '100%', padding: 6, marginBottom: 6 }}
+        className={inputCls}
       />
+      <label className={`${labelCls} mt-2`} htmlFor="new-contact-company">
+        Company (optional)
+      </label>
       <input
-        placeholder="Company (optional)"
+        id="new-contact-company"
+        placeholder="Company"
         value={company}
         onChange={(e) => setCompany(e.target.value)}
-        style={{ display: 'block', width: '100%', padding: 6, marginBottom: 6 }}
+        className={inputCls}
       />
-      {error && <p style={{ color: 'crimson' }}>{error}</p>}
-      <button type="submit" disabled={busy}>
-        {busy ? 'Saving...' : 'Save contact'}
+      {error && <p className="mt-2 text-sm text-red-600 dark:text-red-400">{error}</p>}
+      <button type="submit" disabled={busy} className={`${btnPrimary} mt-3`}>
+        {busy ? 'Saving…' : 'Save contact'}
       </button>
     </form>
   );

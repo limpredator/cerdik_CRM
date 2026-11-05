@@ -1,4 +1,8 @@
-const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:4100';
+// Empty string = relative to the page's own origin, which is correct when
+// the server serves this built app itself (see server/src/index.ts). Set
+// VITE_API_URL only when running the Vite dev server against a server on a
+// different origin.
+const API_URL = import.meta.env.VITE_API_URL ?? '';
 
 export function getToken(): string | null {
   return localStorage.getItem('cerdik_token');

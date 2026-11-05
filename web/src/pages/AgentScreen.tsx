@@ -4,39 +4,49 @@ import { CallPopup } from '../components/CallPopup';
 import { Dialer } from '../components/Dialer';
 import { CallLog } from '../components/CallLog';
 import { MissedCalls } from '../components/MissedCalls';
+import { btnGhost, Card } from '../components/ui';
 
 export function AgentScreen() {
   const { user, extension, logout } = useAuth();
   const { activeCall, dismiss } = useLiveCalls(extension);
 
   return (
-    <div style={{ maxWidth: 900, margin: '32px auto', fontFamily: 'system-ui, sans-serif', padding: '0 16px' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-        <h1 style={{ margin: 0 }}>Cerdik CRM</h1>
-        <div>
-          <span style={{ marginRight: 12 }}>
-            {user?.name} — ext {extension}
-          </span>
-          <button onClick={logout}>Sign out</button>
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+      <header className="border-b border-zinc-100 bg-white dark:border-zinc-800/80 dark:bg-zinc-900">
+        <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3">
+          <div className="flex items-center gap-2.5">
+            <img src="/logo.svg" alt="" className="h-8 w-8 rounded-lg" />
+            <span className="font-semibold text-zinc-900 dark:text-zinc-50">Cerdik CRM</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-zinc-500 dark:text-zinc-400">
+              {user?.name} — ext {extension}
+            </span>
+            <button onClick={logout} className={btnGhost}>
+              Sign out
+            </button>
+          </div>
         </div>
       </header>
 
-      {activeCall && <CallPopup call={activeCall} onDismiss={dismiss} />}
+      <main className="mx-auto max-w-4xl px-4 py-6">
+        {activeCall && <CallPopup call={activeCall} onDismiss={dismiss} />}
 
-      <section style={{ marginBottom: 32 }}>
-        <h2>Dial</h2>
-        <Dialer />
-      </section>
+        <Card className="mb-6 p-5">
+          <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">Dial</h2>
+          <Dialer />
+        </Card>
 
-      <section style={{ marginBottom: 32 }}>
-        <h2>Missed calls</h2>
-        <MissedCalls />
-      </section>
+        <Card className="mb-6 p-5">
+          <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">Missed calls</h2>
+          <MissedCalls />
+        </Card>
 
-      <section>
-        <h2>Call log</h2>
-        <CallLog />
-      </section>
+        <Card className="p-5">
+          <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-zinc-50">Call log</h2>
+          <CallLog />
+        </Card>
+      </main>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../lib/api';
 import { useAuth } from '../lib/auth';
+import { Card, btnPrimary, btnSecondary, inputCls } from '../components/ui';
 
 export function ExtensionPicker() {
   const { pickExtension } = useAuth();
@@ -23,33 +24,45 @@ export function ExtensionPicker() {
   };
 
   return (
-    <div style={{ maxWidth: 420, margin: '80px auto', fontFamily: 'system-ui, sans-serif' }}>
-      <h1>Which extension are you on?</h1>
-      {error && <p style={{ color: 'crimson' }}>{error} — you can still type it in below.</p>}
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {extensions.map((ext) => (
-          <li key={ext.extension} style={{ marginBottom: 8 }}>
-            <button onClick={() => choose(ext.extension)} style={{ width: '100%', padding: 10, textAlign: 'left' }}>
-              {ext.extension} — {ext.name}
-            </button>
-          </li>
-        ))}
-      </ul>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (manual.trim()) choose(manual.trim());
-        }}
-        style={{ marginTop: 16, display: 'flex', gap: 8 }}
-      >
-        <input
-          placeholder="e.g. 204"
-          value={manual}
-          onChange={(e) => setManual(e.target.value)}
-          style={{ flex: 1, padding: 8 }}
-        />
-        <button type="submit">Use this</button>
-      </form>
+    <div className="flex min-h-screen items-center justify-center bg-zinc-50 px-4 dark:bg-zinc-950">
+      <Card className="w-full max-w-sm p-8">
+        <img src="/logo.svg" alt="" className="mx-auto mb-4 h-14 w-14 rounded-xl" />
+        <h1 className="mb-1 text-center text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+          Which extension are you on?
+        </h1>
+        {error && (
+          <p className="mt-2 text-center text-sm text-amber-600 dark:text-amber-400">
+            {error} — you can still type it in below.
+          </p>
+        )}
+        {extensions.length > 0 && (
+          <div className="mt-5 flex flex-col gap-2">
+            {extensions.map((ext) => (
+              <button key={ext.extension} onClick={() => choose(ext.extension)} className={`${btnSecondary} justify-start`}>
+                <span className="font-semibold">{ext.extension}</span>
+                <span className="text-zinc-500 dark:text-zinc-400">{ext.name}</span>
+              </button>
+            ))}
+          </div>
+        )}
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (manual.trim()) choose(manual.trim());
+          }}
+          className="mt-5 flex gap-2"
+        >
+          <input
+            placeholder="e.g. 204"
+            value={manual}
+            onChange={(e) => setManual(e.target.value)}
+            className={inputCls}
+          />
+          <button type="submit" className={`${btnPrimary} whitespace-nowrap`}>
+            Use this
+          </button>
+        </form>
+      </Card>
     </div>
   );
 }
