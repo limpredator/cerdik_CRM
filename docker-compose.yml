@@ -1,0 +1,26 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: cerdik
+      POSTGRES_PASSWORD: cerdik
+      POSTGRES_DB: cerdik_crm
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  # Local broker for dev/testing only. In production the PBX connects out to
+  # a broker you host — see docs/MQTT-API.md — point MQTT_BROKER_URL at that
+  # one instead of this container.
+  mosquitto:
+    image: eclipse-mosquitto:2
+    restart: unless-stopped
+    ports:
+      - '1883:1883'
+    volumes:
+      - ./docker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+
+volumes:
+  pgdata:
