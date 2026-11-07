@@ -9,11 +9,11 @@
   </defs>
   <rect width="512" height="512" rx="116" fill="url(#bg)"/>
   <rect x="1.5" y="1.5" width="509" height="509" rx="114.5" fill="none" stroke="#3a4252" stroke-width="3"/>
-  <!-- outer C: the Cerdik brand ring -->
-  <path d="M371 160 A150 150 0 1 0 371 352" fill="none" stroke="url(#o)" stroke-width="48" stroke-linecap="round"/>
+  <!-- outer C: the Cerdik brand ring, centered on the badge -->
+  <path d="M372 160 A150 150 0 1 0 372 352" fill="none" stroke="url(#o)" stroke-width="44" stroke-linecap="round"/>
   <!-- the call: closes the ring -->
-  <circle cx="352" cy="256" r="17" fill="url(#o)"/>
-  <!-- the contact: a customer silhouette for CRM -->
-  <circle cx="237" cy="214" r="31" fill="#f4f6fa"/>
-  <path d="M152 338 C152 280 189 240 237 240 C285 240 322 280 322 338 L322 346 L152 346 Z" fill="#f4f6fa"/>
+  <circle cx="352" cy="256" r="16" fill="url(#o)"/>
+  <!-- the contact: a simple outline figure, centered on the same point as the ring -->
+  <circle cx="256" cy="206" r="34" fill="none" stroke="#f4f6fa" stroke-width="20"/>
+  <path d="M182 340 A92 92 0 0 1 330 340" fill="none" stroke="#f4f6fa" stroke-width="20" stroke-linecap="round"/>
 </svg>
