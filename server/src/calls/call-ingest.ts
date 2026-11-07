@@ -2,6 +2,7 @@ import type { Pool } from 'pg';
 import type { PbxConnector, PbxEvent } from '@cerdik-crm/shared';
 import { isLikelyExtension, normalizePhone } from '@cerdik-crm/shared';
 import type { WsHub } from '../ws/hub';
+import { findContactByE164 } from '../contacts/lookup';
 
 /** Bridges PBX events (via the connector) into: live WS pushes for the
  * agent screen (ringing pop, call ended) and persisted call/call_event
@@ -92,17 +93,6 @@ async function handleEvent(pool: Pool, companyId: string, connector: PbxConnecto
 function classify(value: string): { isExtension: boolean; normalized: string | null } {
   if (isLikelyExtension(value)) return { isExtension: true, normalized: null };
   return { isExtension: false, normalized: normalizePhone(value) ?? value };
-}
-
-async function findContactByE164(pool: Pool, companyId: string, e164: string | null) {
-  if (!e164) return null;
-  const { rows } = await pool.query<{ id: string; name: string }>(
-    `SELECT contacts.id, contacts.name FROM contact_phones
-     JOIN contacts ON contacts.id = contact_phones.contact_id
-     WHERE contact_phones.company_id = $1 AND contact_phones.e164 = $2 LIMIT 1`,
-    [companyId, e164],
-  );
-  return rows[0] ?? null;
 }
 
 /** PBX timestamps are "YYYY-MM-DD HH:MM:SS" local time, no timezone — see

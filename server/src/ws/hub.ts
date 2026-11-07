@@ -47,4 +47,15 @@ export class WsHub {
       if (ws.readyState === ws.OPEN) ws.send(payload);
     }
   }
+
+  /** Enquiries aren't extension-scoped like calls — every connected agent
+   * should see a new one land, whichever extension they picked. */
+  broadcastAll(message: Record<string, unknown>): void {
+    const payload = JSON.stringify(message);
+    for (const sockets of this.sockets.values()) {
+      for (const ws of sockets) {
+        if (ws.readyState === ws.OPEN) ws.send(payload);
+      }
+    }
+  }
 }

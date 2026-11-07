@@ -16,6 +16,7 @@ import { callsRouter } from './routes/calls';
 import { extensionsRouter } from './routes/extensions';
 import { auditLogRouter } from './routes/audit-log';
 import { reportsRouter } from './routes/reports';
+import { enquiriesRouter } from './routes/enquiries';
 
 async function main(): Promise<void> {
   assertConfigured();
@@ -48,6 +49,7 @@ async function main(): Promise<void> {
   app.use('/api/extensions', extensionsRouter(authProvider, connector));
   app.use('/api/audit-log', auditLogRouter(pool, authProvider));
   app.use('/api/reports', reportsRouter(pool, authProvider));
+  app.use('/api/enquiries', enquiriesRouter(pool, authProvider, hub));
 
   // Serves the built web app (`npm run build -w web`) same-origin, so one
   // process is everything a single-click launcher needs to start — see

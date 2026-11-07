@@ -80,6 +80,33 @@ export interface CallRecord {
   notes: string | null;
 }
 
+export interface EnquiryMessage {
+  id: string;
+  direction: string;
+  senderName: string | null;
+  senderContact: string | null;
+  body: string;
+  createdAt: string;
+}
+
+export interface Enquiry {
+  id: string;
+  contactId: string | null;
+  contactName: string | null;
+  senderName: string | null;
+  senderContact: string | null;
+  channel: string;
+  status: string;
+  subject: string | null;
+  assignedTo: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface EnquiryDetail extends Enquiry {
+  messages: EnquiryMessage[];
+}
+
 export interface MissedCallGroup {
   fromE164: string;
   contactId: string | null;
@@ -129,4 +156,17 @@ export const api = {
       avgHandleSec: number;
       daily: Array<{ day: string; total: number; missed: number }>;
     }>('/api/reports/summary'),
+
+  enquiries: (filters?: { status?: string; channel?: string }) => {
+    const params = new URLSearchParams();
+    if (filters?.status) params.set('status', filters.status);
+    if (filters?.channel) params.set('channel', filters.channel);
+    const qs = params.toString();
+    return request<Enquiry[]>(`/api/enquiries${qs ? `?${qs}` : ''}`);
+  },
+  enquiry: (id: string) => request<EnquiryDetail>(`/api/enquiries/${id}`),
+  updateEnquiry: (id: string, data: { status?: string; assignedTo?: string }) =>
+    request<Enquiry>(`/api/enquiries/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+  replyToEnquiry: (id: string, body: string) =>
+    request<EnquiryMessage>(`/api/enquiries/${id}/messages`, { method: 'POST', body: JSON.stringify({ body }) }),
 };

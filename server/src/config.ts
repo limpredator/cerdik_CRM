@@ -22,6 +22,10 @@ export const config = {
     url: process.env.DATABASE_URL ?? 'postgres://cerdik:cerdik@localhost:5432/cerdik_crm',
   },
 
+  enquiries: {
+    websiteWebhookSecret: process.env.WEBSITE_WEBHOOK_SECRET ?? '',
+  },
+
   mqtt: {
     // Broker WE host — the PBX connects OUT to this (see docs/MQTT-API.md).
     brokerUrl: process.env.MQTT_BROKER_URL ?? 'mqtt://127.0.0.1:1883',

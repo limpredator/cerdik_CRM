@@ -1,7 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider, useAuth } from './lib/auth';
 import { AppShell } from './components/AppShell';
-import { EmptyState } from './components/ui';
 import { Login } from './pages/Login';
 import { ExtensionPicker } from './pages/ExtensionPicker';
 import { AgentScreen } from './pages/AgentScreen';
@@ -10,6 +9,8 @@ import { Settings } from './pages/Settings';
 import { Contacts } from './pages/Contacts';
 import { ContactDetail } from './pages/ContactDetail';
 import { Dashboard } from './pages/Dashboard';
+import { Enquiries } from './pages/Enquiries';
+import { EnquiryDetail } from './pages/EnquiryDetail';
 
 function RequireAuth({ children }: { children: React.ReactElement }) {
   const { user } = useAuth();
@@ -86,7 +87,7 @@ function AppRoutes() {
         path="/enquiries"
         element={
           <RequireExtension>
-            <EmptyState title="Enquiries" hint="Coming soon." />
+            <Enquiries />
           </RequireExtension>
         }
       />
@@ -94,7 +95,7 @@ function AppRoutes() {
         path="/enquiries/:id"
         element={
           <RequireExtension>
-            <EmptyState title="Enquiry" hint="Coming soon." />
+            <EnquiryDetail />
           </RequireExtension>
         }
       />
