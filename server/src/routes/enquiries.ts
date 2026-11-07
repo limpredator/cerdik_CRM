@@ -126,8 +126,15 @@ export function enquiriesRouter(pool: Pool, authProvider: AuthProvider, hub: WsH
   router.get('/:id', async (req: AuthedRequest, res) => {
     const { companyId, userId } = req.auth!;
     const { rows } = await pool.query<EnquiryRow>(
-      `SELECT enquiries.*, contacts.name AS contact_name
-       FROM enquiries LEFT JOIN contacts ON contacts.id = enquiries.contact_id
+      `SELECT enquiries.*, contacts.name AS contact_name,
+              first_msg.sender_name, first_msg.sender_contact
+       FROM enquiries
+       LEFT JOIN contacts ON contacts.id = enquiries.contact_id
+       LEFT JOIN LATERAL (
+         SELECT sender_name, sender_contact FROM enquiry_messages
+         WHERE enquiry_messages.enquiry_id = enquiries.id AND direction = 'inbound'
+         ORDER BY created_at ASC LIMIT 1
+       ) first_msg ON true
        WHERE enquiries.id = $1 AND enquiries.company_id = $2`,
       [req.params.id, companyId],
     );
