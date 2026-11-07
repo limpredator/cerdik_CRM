@@ -3,17 +3,15 @@
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#1b1f2a"/><stop offset="1" stop-color="#0f1218"/>
     </linearGradient>
-    <linearGradient id="o" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#ff9a4d"/><stop offset="1" stop-color="#e8691a"/>
-    </linearGradient>
   </defs>
   <rect width="512" height="512" rx="116" fill="url(#bg)"/>
   <rect x="1.5" y="1.5" width="509" height="509" rx="114.5" fill="none" stroke="#3a4252" stroke-width="3"/>
-  <!-- outer C: the Cerdik brand ring, centered on the badge -->
-  <path d="M372 160 A150 150 0 1 0 372 352" fill="none" stroke="url(#o)" stroke-width="44" stroke-linecap="round"/>
-  <!-- the call: closes the ring -->
-  <circle cx="352" cy="256" r="16" fill="url(#o)"/>
-  <!-- the contact: a simple outline figure, centered on the same point as the ring -->
-  <circle cx="256" cy="206" r="34" fill="none" stroke="#f4f6fa" stroke-width="20"/>
-  <path d="M182 340 A92 92 0 0 1 330 340" fill="none" stroke="#f4f6fa" stroke-width="20" stroke-linecap="round"/>
+  <!-- contact card: the universal "this manages contacts" shape -->
+  <rect x="106" y="146" width="300" height="220" rx="28" fill="none" stroke="#f4f6fa" stroke-width="20"/>
+  <!-- avatar: head + shoulders -->
+  <circle cx="196" cy="238" r="30" fill="#e8691a"/>
+  <path d="M146 326 A50 50 0 0 1 246 326" fill="#e8691a"/>
+  <!-- text rows, standing in for name/detail fields -->
+  <rect x="266" y="220" width="104" height="16" rx="8" fill="#e8691a"/>
+  <rect x="266" y="256" width="78" height="16" rx="8" fill="#e8691a"/>
 </svg>
