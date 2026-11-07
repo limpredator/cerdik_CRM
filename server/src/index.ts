@@ -14,6 +14,8 @@ import { authRouter } from './routes/auth';
 import { contactsRouter } from './routes/contacts';
 import { callsRouter } from './routes/calls';
 import { extensionsRouter } from './routes/extensions';
+import { auditLogRouter } from './routes/audit-log';
+import { reportsRouter } from './routes/reports';
 
 async function main(): Promise<void> {
   assertConfigured();
@@ -40,10 +42,12 @@ async function main(): Promise<void> {
   app.use(cors());
   app.use(express.json());
   app.get('/health', (_req, res) => res.json({ ok: true, pbxConnected: connector.isConnected() }));
-  app.use('/api/auth', authRouter(authProvider));
+  app.use('/api/auth', authRouter(authProvider, pool));
   app.use('/api/contacts', contactsRouter(pool, authProvider));
   app.use('/api/calls', callsRouter(pool, authProvider, connector));
   app.use('/api/extensions', extensionsRouter(authProvider, connector));
+  app.use('/api/audit-log', auditLogRouter(pool, authProvider));
+  app.use('/api/reports', reportsRouter(pool, authProvider));
 
   // Serves the built web app (`npm run build -w web`) same-origin, so one
   // process is everything a single-click launcher needs to start — see

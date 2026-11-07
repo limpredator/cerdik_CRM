@@ -8,6 +8,7 @@ export interface Role {
   id: string;
   companyId: string;
   name: string;
+  isAdmin: boolean;
 }
 
 export interface User {
@@ -17,6 +18,7 @@ export interface User {
   email: string;
   name: string;
   extension: string | null;
+  isAdmin: boolean;
   createdAt: string;
 }
 
@@ -57,6 +59,8 @@ export interface CallRecord {
   durationSec: number;
   disposition: CallDisposition;
   recordingFile: string | null;
+  outcome: string | null;
+  notes: string | null;
 }
 
 export type CallEventType = 'invite' | 'ringing' | 'answered' | 'ended';

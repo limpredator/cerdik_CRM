@@ -4,6 +4,7 @@ import { api, getToken, setToken, type LoginResponse } from './api';
 interface AuthState {
   user: LoginResponse['user'] | null;
   extension: string | null;
+  isAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   pickExtension: (extension: string) => void;
@@ -43,9 +44,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const pickExtension = (ext: string) => {
     localStorage.setItem('cerdik_extension', ext);
     setExtension(ext);
+    // Persists to users.extension and swaps in a token carrying the new
+    // value, so server-side extension scoping stays correct for the rest of
+    // the session. Best-effort: the picker already applied optimistically.
+    api.setExtension(ext).then((res) => setToken(res.token)).catch(() => {});
   };
 
-  const value = useMemo(() => ({ user, extension, login, logout, pickExtension }), [user, extension]);
+  const value = useMemo(
+    () => ({ user, extension, isAdmin: user?.isAdmin ?? false, login, logout, pickExtension }),
+    [user, extension],
+  );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

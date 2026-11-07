@@ -11,7 +11,17 @@ export interface AuthResult {
  * shared/SSO login without touching any route or UI code that just needs
  * "who is this request from".
  */
+export interface AuthTokenPayload {
+  userId: string;
+  companyId: string;
+  isAdmin: boolean;
+  extension: string | null;
+}
+
 export interface AuthProvider {
   login(email: string, password: string): Promise<AuthResult>;
-  verifyToken(token: string): Promise<{ userId: string; companyId: string } | null>;
+  verifyToken(token: string): Promise<AuthTokenPayload | null>;
+  /** Re-signs a token with updated claims (e.g. after picking an extension)
+   * without requiring the password again. */
+  refreshToken(payload: AuthTokenPayload): Promise<string>;
 }

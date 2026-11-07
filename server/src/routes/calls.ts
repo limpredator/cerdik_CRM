@@ -20,6 +20,8 @@ interface CallRow {
   duration_sec: number;
   disposition: string;
   recording_file: string | null;
+  outcome: string | null;
+  notes: string | null;
   contact_name: string | null;
 }
 
@@ -39,6 +41,8 @@ function toCall(row: CallRow) {
     durationSec: row.duration_sec,
     disposition: row.disposition,
     recordingFile: row.recording_file,
+    outcome: row.outcome,
+    notes: row.notes,
   };
 }
 
@@ -47,14 +51,25 @@ export function callsRouter(pool: Pool, authProvider: AuthProvider, connector: P
   router.use(requireAuth(authProvider));
 
   router.get('/', async (req: AuthedRequest, res) => {
-    const { companyId } = req.auth!;
+    const { companyId, isAdmin, extension } = req.auth!;
+    const contactId = typeof req.query.contactId === 'string' ? req.query.contactId : null;
+    const conditions = ['calls.company_id = $1'];
+    const params: unknown[] = [companyId];
+    if (!isAdmin) {
+      params.push(extension);
+      conditions.push(`calls.extension = $${params.length}`);
+    }
+    if (contactId) {
+      params.push(contactId);
+      conditions.push(`calls.contact_id = $${params.length}`);
+    }
     const { rows } = await pool.query<CallRow>(
       `SELECT calls.*, contacts.name AS contact_name
        FROM calls LEFT JOIN contacts ON contacts.id = calls.contact_id
-       WHERE calls.company_id = $1
+       WHERE ${conditions.join(' AND ')}
        ORDER BY calls.started_at DESC
        LIMIT 200`,
-      [companyId],
+      params,
     );
     res.json(rows.map(toCall));
   });
@@ -62,7 +77,17 @@ export function callsRouter(pool: Pool, authProvider: AuthProvider, connector: P
   /** Unanswered inbound calls, grouped by the caller's number — the
    * "missed calls" list the agent screen's sidebar shows. */
   router.get('/missed', async (req: AuthedRequest, res) => {
-    const { companyId } = req.auth!;
+    const { companyId, isAdmin, extension } = req.auth!;
+    const conditions = [
+      'calls.company_id = $1',
+      "calls.direction = 'inbound'",
+      "calls.disposition != 'answered'",
+    ];
+    const params: unknown[] = [companyId];
+    if (!isAdmin) {
+      params.push(extension);
+      conditions.push(`calls.extension = $${params.length}`);
+    }
     const { rows } = await pool.query<{
       from_e164: string;
       contact_name: string | null;
@@ -73,11 +98,11 @@ export function callsRouter(pool: Pool, authProvider: AuthProvider, connector: P
       `SELECT calls.from_e164, contacts.name AS contact_name, contacts.id AS contact_id,
               COUNT(*) AS count, MAX(calls.started_at) AS last_at
        FROM calls LEFT JOIN contacts ON contacts.id = calls.contact_id
-       WHERE calls.company_id = $1 AND calls.direction = 'inbound' AND calls.disposition != 'answered'
+       WHERE ${conditions.join(' AND ')}
        GROUP BY calls.from_e164, contacts.name, contacts.id
        ORDER BY last_at DESC
        LIMIT 100`,
-      [companyId],
+      params,
     );
     res.json(
       rows.map((row) => ({
@@ -103,6 +128,25 @@ export function callsRouter(pool: Pool, authProvider: AuthProvider, connector: P
       return;
     }
     await writeAuditLog(pool, { companyId, userId, action: 'call.view', entityType: 'call', entityId: req.params.id });
+    res.json(toCall(rows[0]));
+  });
+
+  router.patch('/:id/notes', async (req: AuthedRequest, res) => {
+    const { companyId, userId } = req.auth!;
+    const { outcome, notes } = req.body ?? {};
+    const { rows } = await pool.query<CallRow>(
+      `UPDATE calls SET
+         outcome = COALESCE($1, outcome),
+         notes = COALESCE($2, notes)
+       WHERE id = $3 AND company_id = $4
+       RETURNING *, (SELECT name FROM contacts WHERE contacts.id = calls.contact_id) AS contact_name`,
+      [typeof outcome === 'string' ? outcome : null, typeof notes === 'string' ? notes : null, req.params.id, companyId],
+    );
+    if (!rows[0]) {
+      res.status(404).json({ error: 'Not found' });
+      return;
+    }
+    await writeAuditLog(pool, { companyId, userId, action: 'call.annotate', entityType: 'call', entityId: req.params.id });
     res.json(toCall(rows[0]));
   });
 

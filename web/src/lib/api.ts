@@ -33,7 +33,18 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
 export interface LoginResponse {
   token: string;
-  user: { id: string; email: string; name: string; extension: string | null; companyId: string };
+  user: { id: string; email: string; name: string; extension: string | null; companyId: string; isAdmin: boolean };
+}
+
+export interface AuditLogEntry {
+  id: string;
+  userId: string | null;
+  userName: string | null;
+  action: string;
+  entityType: string;
+  entityId: string | null;
+  occurredAt: string;
+  ipAddress: string | null;
 }
 
 export interface ContactPhone {
@@ -65,6 +76,8 @@ export interface CallRecord {
   durationSec: number;
   disposition: string;
   recordingFile: string | null;
+  outcome: string | null;
+  notes: string | null;
 }
 
 export interface MissedCallGroup {
@@ -78,6 +91,11 @@ export interface MissedCallGroup {
 export const api = {
   login: (email: string, password: string) =>
     request<LoginResponse>('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) }),
+  setExtension: (extension: string) =>
+    request<{ ok: true; token: string }>('/api/auth/extension', {
+      method: 'POST',
+      body: JSON.stringify({ extension }),
+    }),
 
   extensions: () => request<Array<{ extension: string; name: string }>>('/api/extensions'),
 
@@ -91,8 +109,24 @@ export const api = {
     request<Contact>(`/api/contacts/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
   contact: (id: string) => request<Contact>(`/api/contacts/${id}`),
 
-  callLog: () => request<CallRecord[]>('/api/calls'),
+  callLog: (contactId?: string) =>
+    request<CallRecord[]>(`/api/calls${contactId ? `?contactId=${encodeURIComponent(contactId)}` : ''}`),
   missedCalls: () => request<MissedCallGroup[]>('/api/calls/missed'),
   dial: (target: string, extension: string) =>
     request<{ ok: true }>('/api/calls/dial', { method: 'POST', body: JSON.stringify({ target, extension }) }),
+  annotateCall: (id: string, data: { outcome?: string; notes?: string }) =>
+    request<CallRecord>(`/api/calls/${id}/notes`, { method: 'PATCH', body: JSON.stringify(data) }),
+
+  auditLog: () => request<AuditLogEntry[]>('/api/audit-log'),
+
+  reportsSummary: () =>
+    request<{
+      from: string;
+      to: string;
+      totalCalls: number;
+      answeredCalls: number;
+      answerRate: number;
+      avgHandleSec: number;
+      daily: Array<{ day: string; total: number; missed: number }>;
+    }>('/api/reports/summary'),
 };

@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import type { Pool } from 'pg';
-import type { AuthProvider, AuthResult, User } from '@cerdik-crm/shared';
+import type { AuthProvider, AuthResult, AuthTokenPayload, User } from '@cerdik-crm/shared';
 
 interface UserRow {
   id: string;
@@ -12,6 +12,7 @@ interface UserRow {
   name: string;
   extension: string | null;
   created_at: Date;
+  is_admin: boolean;
 }
 
 function toUser(row: UserRow): User {
@@ -22,6 +23,7 @@ function toUser(row: UserRow): User {
     email: row.email,
     name: row.name,
     extension: row.extension,
+    isAdmin: row.is_admin,
     createdAt: row.created_at.toISOString(),
   };
 }
@@ -38,24 +40,34 @@ export class LocalAuthProvider implements AuthProvider {
   ) {}
 
   async login(email: string, password: string): Promise<AuthResult> {
-    const { rows } = await this.pool.query<UserRow>('SELECT * FROM users WHERE email = $1', [email]);
+    const { rows } = await this.pool.query<UserRow>(
+      `SELECT users.*, roles.is_admin
+       FROM users JOIN roles ON roles.id = users.role_id
+       WHERE users.email = $1`,
+      [email],
+    );
     const row = rows[0];
     if (!row) throw new Error('Invalid email or password');
     const ok = await bcrypt.compare(password, row.password_hash);
     if (!ok) throw new Error('Invalid email or password');
     const user = toUser(row);
-    const token = jwt.sign({ userId: user.id, companyId: user.companyId }, this.jwtSecret, {
-      expiresIn: '12h',
-    });
+    const token = jwt.sign(
+      { userId: user.id, companyId: user.companyId, isAdmin: user.isAdmin, extension: user.extension },
+      this.jwtSecret,
+      { expiresIn: '12h' },
+    );
     return { user, token };
   }
 
-  async verifyToken(token: string): Promise<{ userId: string; companyId: string } | null> {
+  async verifyToken(token: string): Promise<AuthTokenPayload | null> {
     try {
-      const decoded = jwt.verify(token, this.jwtSecret) as { userId: string; companyId: string };
-      return { userId: decoded.userId, companyId: decoded.companyId };
+      return jwt.verify(token, this.jwtSecret) as AuthTokenPayload;
     } catch {
       return null;
     }
+  }
+
+  async refreshToken(payload: AuthTokenPayload): Promise<string> {
+    return jwt.sign(payload, this.jwtSecret, { expiresIn: '12h' });
   }
 }

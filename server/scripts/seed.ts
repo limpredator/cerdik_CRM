@@ -23,11 +23,12 @@ async function main(): Promise<void> {
   const roleId =
     existingRole[0]?.id ??
     (
-      await pool.query<{ id: string }>('INSERT INTO roles (company_id, name) VALUES ($1, $2) RETURNING id', [
-        companyId,
-        'admin',
-      ])
+      await pool.query<{ id: string }>(
+        'INSERT INTO roles (company_id, name, is_admin) VALUES ($1, $2, true) RETURNING id',
+        [companyId, 'admin'],
+      )
     ).rows[0].id;
+  await pool.query('UPDATE roles SET is_admin = true WHERE id = $1', [roleId]);
 
   const { rows: existingUser } = await pool.query('SELECT id FROM users WHERE company_id = $1 AND email = $2', [
     companyId,

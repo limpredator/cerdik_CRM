@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { api, type MissedCallGroup } from '../lib/api';
 import { DialButton } from './Dialer';
 import { Avatar, EmptyState } from './ui';
@@ -26,7 +27,16 @@ export function MissedCalls() {
             <div className="flex min-w-0 items-center gap-3">
               <Avatar name={name} size={9} />
               <div className="min-w-0">
-                <p className="truncate font-medium text-zinc-900 dark:text-zinc-50">{name}</p>
+                {group.contactId ? (
+                  <Link
+                    to={`/contacts/${group.contactId}`}
+                    className="truncate font-medium text-zinc-900 hover:underline dark:text-zinc-50"
+                  >
+                    {name}
+                  </Link>
+                ) : (
+                  <p className="truncate font-medium text-zinc-900 dark:text-zinc-50">{name}</p>
+                )}
                 <p className="text-xs text-zinc-500 dark:text-zinc-400">
                   {group.count}× · last {new Date(group.lastAt).toLocaleString()}
                 </p>

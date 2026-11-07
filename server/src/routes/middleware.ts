@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from 'express';
-import type { AuthProvider } from '@cerdik-crm/shared';
+import type { AuthProvider, AuthTokenPayload } from '@cerdik-crm/shared';
 
 export interface AuthedRequest extends Request {
-  auth?: { userId: string; companyId: string };
+  auth?: AuthTokenPayload;
 }
 
 export function requireAuth(authProvider: AuthProvider) {
@@ -19,6 +19,17 @@ export function requireAuth(authProvider: AuthProvider) {
       return;
     }
     req.auth = auth;
+    next();
+  };
+}
+
+/** Mount after `requireAuth` — 403s any non-admin request. */
+export function requireAdmin() {
+  return (req: AuthedRequest, res: Response, next: NextFunction) => {
+    if (!req.auth?.isAdmin) {
+      res.status(403).json({ error: 'Admin access required' });
+      return;
+    }
     next();
   };
 }
