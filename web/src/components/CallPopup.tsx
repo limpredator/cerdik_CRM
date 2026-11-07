@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import type { RingingCall } from '../lib/useLiveCalls';
 import { NewContactForm } from './NewContactForm';
 import { CallTimer } from './CallTimer';
@@ -6,6 +6,8 @@ import { Avatar, btnGhost, Card } from './ui';
 
 export function CallPopup({ call, onDismiss }: { call: RingingCall; onDismiss: () => void }) {
   const since = useMemo(() => Date.now(), [call.callId]);
+  const [savedContact, setSavedContact] = useState<{ id: string; name: string } | null>(null);
+  const contact = call.contact ?? savedContact;
 
   return (
     <Card className="mb-6 border-indigo-200 p-5 dark:border-indigo-800/60">
@@ -16,12 +18,12 @@ export function CallPopup({ call, onDismiss }: { call: RingingCall; onDismiss: (
         <CallTimer since={since} />
       </div>
       <div className="mt-3 flex items-center gap-3">
-        <Avatar name={call.contact?.name ?? call.otherNumber ?? call.fromExtension} size={12} />
+        <Avatar name={contact?.name ?? call.otherNumber ?? call.fromExtension} size={12} />
         <div className="min-w-0 flex-1">
-          {call.contact ? (
-            <p className="truncate text-lg font-semibold text-zinc-900 dark:text-zinc-50">{call.contact.name}</p>
+          {contact ? (
+            <p className="truncate text-lg font-semibold text-zinc-900 dark:text-zinc-50">{contact.name}</p>
           ) : call.otherNumber ? (
-            <NewContactForm phone={call.otherNumber} onCreated={() => {}} />
+            <NewContactForm phone={call.otherNumber} onCreated={setSavedContact} />
           ) : (
             <p className="text-sm text-zinc-700 dark:text-zinc-200">Internal call from extension {call.fromExtension}</p>
           )}

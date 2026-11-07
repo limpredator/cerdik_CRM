@@ -24,9 +24,13 @@ type LiveMessage = RingingCall | CallEnded;
 
 /** Opens one WS connection for the picked extension and surfaces the
  * current ringing/active call, if any — the agent screen's live call pop
- * and timer are driven entirely from this. */
+ * and timer are driven entirely from this. Also hands back a
+ * `callEndedCount` that bumps on every finished call, so the call log and
+ * missed-calls list (which only fetch once on mount) can key off it to
+ * refetch without the agent having to reload the page. */
 export function useLiveCalls(extension: string | null) {
   const [activeCall, setActiveCall] = useState<RingingCall | null>(null);
+  const [callEndedCount, setCallEndedCount] = useState(0);
   const socketRef = useRef<WebSocket | null>(null);
 
   useEffect(() => {
@@ -43,6 +47,7 @@ export function useLiveCalls(extension: string | null) {
         setActiveCall(msg);
       } else if (msg.kind === 'callEnded') {
         setActiveCall((current) => (current?.callId === msg.callId ? null : current));
+        setCallEndedCount((count) => count + 1);
       }
     };
 
@@ -52,5 +57,5 @@ export function useLiveCalls(extension: string | null) {
     };
   }, [extension]);
 
-  return { activeCall, dismiss: () => setActiveCall(null) };
+  return { activeCall, callEndedCount, dismiss: () => setActiveCall(null) };
 }

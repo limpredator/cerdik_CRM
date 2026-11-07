@@ -21,8 +21,8 @@ export function CallLog() {
   if (calls.length === 0) return <EmptyState title="No calls yet" hint="Finished calls will show up here." />;
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-zinc-100 dark:border-zinc-800/80">
-      <table className="w-full border-collapse text-sm">
+    <div className="overflow-x-auto rounded-2xl border border-zinc-100 dark:border-zinc-800/80">
+      <table className="w-full min-w-[640px] border-collapse text-sm">
         <thead>
           <tr className="border-b border-zinc-100 text-left text-xs font-medium text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
             <th className="px-4 py-2.5 font-medium">When</th>
