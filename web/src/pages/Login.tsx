@@ -17,7 +17,9 @@ export function Login() {
     setBusy(true);
     try {
       await login(email, password);
-      navigate('/pick-extension');
+      // login() auto-applies a saved extension when the server already has
+      // one; only land on the picker when it still needs to be chosen.
+      navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed');
     } finally {
